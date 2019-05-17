@@ -1,7 +1,10 @@
 """
-PLEASE DOCUMENT HERE
+Trish Gagnon
 
 Usage: python3 project3.py DATASET.csv
+Only the increment data set works right now, and "works" is a strong word - 
+all I adjust turns to nan values. Print statements have been left in if you
+would like to see for yourself
 """
 
 import csv, sys, random, math
@@ -108,15 +111,20 @@ class NeuralNetwork:
 
     def assign_random_weights(self):
         """Each weight is in reference to the incoming weight"""
+        
         allNodes = []
         currentLayer = []
+        #first layer has no incoming weights
         for x in range(self._layers[0]):
             currentLayer.append(NeuralNode([]))
         allNodes.append(currentLayer)
+        
+        #for each non-input layer
         for i in range(1, len(self._layers)):
             currentLayer = []
             for j in range(self._layers[i]):
-                nodeWeights = []
+                nodeWeights = [] 
+                #adds the weights for each node in the previous layer
                 for _ in range(self._layers[i-1]):
                     nodeWeights.append(random.uniform(0,1))
                 node = (NeuralNode(nodeWeights))
@@ -126,19 +134,30 @@ class NeuralNetwork:
             
 
     def forward_propogate(self, x):
+        """Takes the inputs, x, and propogates them forward using the weights to
+        determine the outputs"""
+        
+        #assigns the value of the first layer of nodes
         for i in range(len(self._nodes[0])):
             self._nodes[0][i]._total = x[0][i]
 
+        #goes through the rest of the layers and moves the values forward
         for i in range(1, len(self._layers)):
             for j in range(self._layers[i]):
                 currentNode = self._nodes[i][j]
                 currentNode._total = currentNode._weights[0]
                 for x in range(len(self._nodes[i-1])):
                     currentNode._total += currentNode._weights[x] * self._nodes[i-1][x]._total
-            
+
+                    
     def back_propogation_learning(self, training):
+        """Goes backward through the nodes and readjusts the weights of all the
+        nodes"""
+        
+        #was going to increase this, but the errors were happening much earlier
         for i in range(1):
             for example in training:
+                #check each example
                 self.forward_propogate(example)
                 check = increment_check(example[1], self._nodes[-1])
                 if not check:
@@ -172,11 +191,16 @@ class NeuralNetwork:
                     self.reset_all_faults()
 
     def reset_all_faults(self):
+        """Resets all faults in the nodes to 0"""
+        
         for layer in self._nodes:
             for node in layer:
                 node._fault = 0
 
 def increment_check(y, nodes):
+    """This checks to see if the output of a forward propogation matches the 
+    expected value"""
+    
     vals = []
     for node in nodes:
         if node._total > .5:
@@ -204,7 +228,6 @@ def main():
     ### this is not mandatory and you could have something else below entirely.
     nn = NeuralNetwork([3, 6, 3], 0.5)
     nn.back_propogation_learning(training)
-    # nn.back_propagation_learning(training)
 
 if __name__ == "__main__":
     main()
